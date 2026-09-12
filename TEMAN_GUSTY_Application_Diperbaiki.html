@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEMAN GUSTY - Aplikasi Perkumpulan Pertemanan</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gustyYellow: '#FACC15', // Kuning cerah
+                        gustyYellowLight: '#FEF08A',
+                        gustyGreen: '#064E3B', // Hijau tua
+                        gustyGreenHover: '#022C22',
+                        gustyEmerald: '#047857',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #FEF08A; }
+        ::-webkit-scrollbar-thumb { background: #064E3B; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-amber-50/50 text-gray-800 h-full flex flex-col antialiased">
+
+    <div id="app" class="flex-1 flex flex-col h-full overflow-hidden">
+
+        <!-- LOGIN VIEW -->
+        <div id="loginView" class="fixed inset-0 z-50 flex items-center justify-center bg-gustyGreen/90 backdrop-blur-sm p-4">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 border-4 border-gustyYellow transform transition-all">
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-gustyYellow rounded-full text-gustyGreen text-3xl font-bold shadow-inner mb-3">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <h1 class="text-3xl font-extrabold text-gustyGreen tracking-tight">TEMAN GUSTY</h1>
+                    <p class="text-sm text-gray-600 mt-1">Aplikasi Solid Perkumpulan Kita Bersama</p>
+                </div>
+                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Nama Panggilan</label>
+                        <input type="text" id="loginName" required placeholder="Cth: Budi, Siska, dll" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gustyGreen focus:outline-none text-sm transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Nomor WhatsApp / ID</label>
+                        <input type="text" id="loginPhone" required placeholder="Cth: 08123456789" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gustyGreen focus:outline-none text-sm transition">
+                    </div>
+                    <button type="submit" class="w-full bg-gustyYellow hover:bg-yellow-400 text-gustyGreen font-bold py-3.5 rounded-xl shadow-lg hover:shadow transition transform active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-right-to-bracket"></i> Masuk Aplikasi
+                    </button>
+                </form>
+                <div class="mt-6 text-center text-xs text-gray-500">
+                    <span class="bg-gustyYellowLight text-gustyGreen px-2 py-1 rounded-md font-medium">Tema: Kuning Cerah & Hijau Tua Cozy</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN APP LAYOUT (Hidden initially) -->
+        <div id="mainApp" class="hidden flex-1 flex flex-col md:flex-row h-full overflow-hidden">
+            
+            <!-- SIDEBAR NAVIGATION -->
+            <aside class="w-full md:w-64 bg-gustyGreen text-white flex flex-col justify-between shrink-0 shadow-xl z-20">
+                <div>
+                    <!-- Logo / Header -->
+                    <div class="p-5 border-b border-gustyGreenHover flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gustyYellow text-gustyGreen flex items-center justify-center font-bold text-lg shadow">
+                            TG
+                        </div>
+                        <div>
+                            <h2 class="font-bold text-lg leading-tight tracking-wide text-gustyYellow">TEMAN GUSTY</h2>
+                            <p class="text-xs text-emerald-200">Keluarga & Sahabat</p>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Links -->
+                    <nav class="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-180px)]">
+                        <button onclick="switchTab('dashboard', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition active-nav bg-gustyYellow text-gustyGreen shadow">
+                            <i class="fa-solid fa-house-chimney w-5"></i> Beranda & Kepengurusan
+                        </button>
+                        <button onclick="switchTab('chat', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-emerald-100 hover:bg-gustyGreenHover transition">
+                            <i class="fa-solid fa-comments w-5"></i> Chat & Kabar
+                        </button>
+                        <button onclick="switchTab('gallery', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-emerald-100 hover:bg-gustyGreenHover transition">
+                            <i class="fa-solid fa-images w-5"></i> Galeri Kenangan
+                        </button>
+                        <button onclick="switchTab('donasi', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-emerald-100 hover:bg-gustyGreenHover transition">
+                            <i class="fa-solid fa-hand-holding-dollar w-5"></i> Menu Donasi
+                        </button>
+                        <button onclick="switchTab('iuran', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-emerald-100 hover:bg-gustyGreenHover transition">
+                            <i class="fa-solid fa-wallet w-5"></i> Kas & Iuran Bulanan
+                        </button>
+                        <button onclick="switchTab('wisata', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-emerald-100 hover:bg-gustyGreenHover transition">
+                            <i class="fa-solid fa-map-location-dot w-5"></i> Rencana Wisata
+                        </button>
+                        <button onclick="switchTab('anggota', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-emerald-100 hover:bg-gustyGreenHover transition">
+                            <i class="fa-solid fa-address-book w-5"></i> Anggota & Riwayat
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- User Profile Footer in Sidebar -->
+                <div class="p-4 bg-gustyGreenHover border-t border-emerald-900 flex items-center justify-between">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div id="userAvatar" class="w-9 h-9 rounded-full bg-gustyYellow text-gustyGreen font-bold flex items-center justify-center shrink-0">
+                            U
+                        </div>
+                        <div class="truncate">
+                            <p id="userNameDisplay" class="text-sm font-semibold truncate text-gustyYellow">Nama User</p>
+                            <p class="text-xs text-emerald-300">Online</p>
+                        </div>
+                    </div>
+                    <button onclick="logout()" title="Keluar" class="text-emerald-300 hover:text-white p-2 rounded-lg transition">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- CONTENT AREA -->
+            <main class="flex-1 flex flex-col h-full overflow-hidden bg-white">
+                
+                <!-- Topbar mobile / Header -->
+                <header class="bg-gustyGreen text-white px-6 py-4 flex items-center justify-between shadow-md md:hidden">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-gustyYellow text-gustyGreen flex items-center justify-center font-bold text-sm">TG</div>
+                        <h1 class="font-bold text-lg text-gustyYellow">TEMAN GUSTY</h1>
+                    </div>
+                    <button onclick="logout()" class="text-sm bg-gustyYellow text-gustyGreen font-semibold px-3 py-1 rounded-lg">Keluar</button>
+                </header>
+
+                <!-- TAB CONTENT CONTAINER -->
+                <div class="flex-1 overflow-y-auto p-4 md:p-8">
+
+                    <!-- 1. DASHBOARD & STRUKTUR KEPENGURUSAN -->
+                    <div id="tab-dashboard" class="tab-content space-y-6">
+                        <div class="bg-gradient-to-r from-gustyGreen to-emerald-800 rounded-3xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
+                            <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-gustyYellow/10 rounded-full blur-2xl pointer-events-none"></div>
+                            <span class="bg-gustyYellow text-gustyGreen text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-3">Selamat Datang di Rumah Kita</span>
+                            <h2 class="text-3xl md:text-4xl font-extrabold text-gustyYellow mb-2">Halo, <span id="welcomeUserName">Teman</span>! 👋</h2>
+                            <p class="text-emerald-100 max-w-2xl text-sm md:text-base leading-relaxed">
+                                Tempat berkumpulnya ikatan pertemanan *TEMAN GUSTY*. Mari jaga kebersamaan, atur jadwal nongkrong, bayar iuran kas, dan simpan kenangan terbaik kita di sini!
+                            </p>
+                            <div class="mt-6 flex flex-wrap gap-3">
+                                <button onclick="switchTab('chat')" class="bg-gustyYellow hover:bg-yellow-400 text-gustyGreen font-bold px-5 py-2.5 rounded-xl text-sm transition shadow">
+                                    <i class="fa-solid fa-comments mr-2"></i> Buka Chat Grup
+                                </button>
+                                <button onclick="switchTab('wisata')" class="bg-emerald-700/80 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition border border-emerald-600">
+                                    <i class="fa-solid fa-plane-departure mr-2"></i> Rencana Trip Berikutnya
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Struktur Kepengurusan -->
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-bold text-gustyGreen flex items-center gap-2">
+                                    <i class="fa-solid fa-sitemap text-gustyYellow bg-gustyGreen p-2 rounded-xl"></i> Susunan Kepengurusan TEMAN GUSTY
+                                </h3>
+                                <span class="text-xs font-medium text-gray-500 bg-amber-100 px-3 py-1 rounded-lg">Periode Aktif 2026</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <!-- Ketua -->
+                                <div class="bg-gradient-to-br from-amber-50 to-amber-100/50 rounded-2xl p-5 border-2 border-gustyYellow shadow-sm hover:shadow-md transition">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-14 h-14 rounded-2xl bg-gustyYellow text-gustyGreen flex items-center justify-center font-bold text-2xl shadow">
+                                            <i class="fa-solid fa-crown"></i>
+                                        </div>
+                                        <div>
+                                            <span class="text-xs font-bold text-amber-800 uppercase tracking-wider">Ketua Grup</span>
+                                            <h4 class="text-lg font-bold text-gustyGreen">Gusty Pratama</h4>
+                                            <p class="text-xs text-gray-600 mt-0.5">Pemimpin & Penggerak Utama</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Wakil -->
+                                <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-gustyGreen flex items-center justify-center font-bold text-xl">
+                                            <i class="fa-solid fa-user-tie"></i>
+                                        </div>
+                                        <div>
+                                            <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Wakil Ketua</span>
+                                            <h4 class="text-lg font-bold text-gray-800">Rizky Maulana</h4>
+                                            <p class="text-xs text-gray-500 mt-0.5">Koordinator Internal & Acara</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Bendahara 1 -->
+                                <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-gustyGreen flex items-center justify-center font-bold text-xl">
+                                            <i class="fa-solid fa-wallet"></i>
+                                        </div>
+                                        <div>
+                                            <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Bendahara 1</span>
+                                            <h4 class="text-lg font-bold text-gray-800">Siti Aminah</h4>
+                                            <p class="text-xs text-gray-500 mt-0.5">Pencatat Kas & Keuangan</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Bendahara 2 -->
+                                <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-gustyGreen flex items-center justify-center font-bold text-xl">
+                                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                                        </div>
+                                        <div>
+                                            <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Bendahara 2</span>
+                                            <h4 class="text-lg font-bold text-gray-800">Dwi Lestari</h4>
+                                            <p class="text-xs text-gray-500 mt-0.5">Pengelola Donasi & Iuran</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Penanggung Jawab -->
+                                <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition sm:col-span-2 lg:col-span-2">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-14 h-14 rounded-2xl bg-gustyYellow/30 text-gustyGreen flex items-center justify-center font-bold text-xl">
+                                            <i class="fa-solid fa-shield-halved"></i>
+                                        </div>
+                                        <div>
+                                            <span class="text-xs font-bold text-amber-800 uppercase tracking-wider">Penanggung Jawab Grup</span>
+                                            <h4 class="text-lg font-bold text-gray-800">Budi Santoso</h4>
+                                            <p class="text-xs text-gray-500 mt-0.5">Pengawas Keamanan, Ketertiban & Keputusan Bersama</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. CHAT & KABAR -->
+                    <div id="tab-chat" class="tab-content hidden h-[calc(100vh-130px)] md:h-[calc(100vh-100px)] flex flex-col bg-amber-50/30 rounded-2xl border border-amber-200 overflow-hidden">
+                        <div class="bg-gustyGreen text-white px-6 py-4 flex items-center justify-between shadow">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gustyYellow text-gustyGreen font-bold flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-comments"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-base text-gustyYellow">Grup Obrolan TEMAN GUSTY</h3>
+                                    <p class="text-xs text-emerald-200">Kirim kabar terbaru & ngobrol santai bersama anggota</p>
+                                </div>
+                            </div>
+                            <span class="bg-emerald-700 text-emerald-100 text-xs px-3 py-1 rounded-full font-medium"><span class="w-2 h-2 inline-block bg-gustyYellow rounded-full mr-1 animate-pulse"></span> 12 Anggota Aktif</span>
+                        </div>
+
+                        <!-- Chat Messages List -->
+                        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
+                            <!-- Populated via JS -->
+                        </div>
+
+                        <!-- Chat Input Form -->
+                        <div class="p-3 bg-white border-t border-gray-200">
+                            <form onsubmit="sendChatMessage(event)" class="flex gap-2">
+                                <input type="text" id="chatInput" placeholder="Ketik kabar atau pesan di sini..." class="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-gustyGreen focus:outline-none text-sm transition">
+                                <button type="submit" class="bg-gustyYellow hover:bg-yellow-400 text-gustyGreen font-bold px-6 py-3 rounded-xl shadow transition flex items-center gap-2">
+                                    <i class="fa-solid fa-paper-plane"></i> Kirim
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 3. GALERI FOTO & VIDEO -->
+                    <div id="tab-gallery" class="tab-content hidden space-y-6">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                            <div>
+                                <h3 class="text-xl font-bold text-gustyGreen">Galeri Kenangan Bersama</h3>
+                                <p class="text-xs text-gray-500 mt-1">Unggah dan unduh momen seru foto & video kegiatan kelompok kita.</p>
+                            </div>
+                            <button onclick="openUploadModal()" class="bg-gustyYellow hover:bg-yellow-400 text-gustyGreen font-bold px-5 py-2.5 rounded-xl text-sm transition shadow flex items-center gap-2">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Unggah Media Baru
+                            </button>
+                        </div>
+
+                        <!-- Gallery Grid -->
+                        <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+
+                    <!-- 4. MENU DONASI -->
+                    <div id="tab-donasi" class="tab-content hidden space-y-6">
+                        <div class="bg-gradient-to-r from-emerald-800 to-gustyGreen text-white p-6 md:p-8 rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div>
+                                <span class="bg-gustyYellow text-gustyGreen text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-3">Sosial & Kepedulian</span>
+                                <h3 class="text-2xl md:text-3xl font-extrabold text-gustyYellow">Kotak Donasi Bersama</h3>
+                                <p class="text-emerald-100 text-sm mt-2 max-w-xl">
+                                    Penggalangan dana sukarela untuk membantu anggota yang terkena musibah, perayaan spesial kelompok, atau kegiatan bakti sosial.
+                                </p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-emerald-600 text-center shrink-0 w-full md:w-auto">
+                                <p class="text-xs text-emerald-200 uppercase font-semibold">Total Terkumpul</p>
+                                <h4 id="totalDonation" class="text-3xl font-extrabold text-gustyYellow mt-1">Rp 0</h4>
+                                <button onclick="openDonationModal()" class="mt-4 w-full bg-gustyYellow hover:bg-yellow-400 text-gustyGreen font-bold px-4 py-2 rounded-xl text-xs transition shadow">
+                                    + Beri Donasi
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Donator List -->
+                        <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                            <h4 class="text-lg font-bold text-gustyGreen mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-gustyYellow"></i> Riwayat & Daftar Donatur
+                            </h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-amber-50 text-gustyGreen uppercase text-xs">
+                                        <tr>
+                                            <th class="p-3 rounded-l-xl">Nama Donatur</th>
+                                            <th class="p-3">Nominal</th>
+                                            <th class="p-3">Pesan / Doa</th>
+                                            <th class="p-3 rounded-r-xl">Waktu</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="donationTableBody" class="divide-y divide-gray-100">
+                                        <!-- Populated via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. MENU IURAN -->
+                    <div id="tab-iuran" class="tab-content hidden space-y-6">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                            <div>
+                                <h3 class="text-xl font-bold text-gustyGreen">Kas & Iuran Bulanan Anggota</h3>
+                                <p class="text-xs text-gray-500 mt-1">Status pembayaran iuran kas rutin untuk keperluan operasional dan kumpul bersama.</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="bg-green-100 text-gustyGreen font-semibold text-xs px-3 py-1.5 rounded-xl">Kas Aktif: <strong id="totalKas">Rp 1.250.000</strong></span>
+                            </div>
+                        </div>
+
+                        <!-- Iuran Table -->
+                        <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-amber-50 text-gustyGreen uppercase text-xs">
+                                        <tr>
+                                            <th class="p-3 rounded-l-xl">Nama Anggota</th>
+                                            <th class="p-3">Periode</th>
+                                            <th class="p-3">Jumlah</th>
+                                            <th class="p-3">Status Iuran</th>
+                                            <th class="p-3 rounded-r-xl text-right">Aksi Pembayaran</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="iuranTableBody" class="divide-y divide-gray-100">
+                                        <!-- Populated via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. MENU RENCANA WISATA -->
+                    <div id="tab-wisata" class="tab-content hidden space-y-6">
+                        <div class="bg-gradient-to-r from-gustyGreen to-emerald-900 rounded-3xl p-6 md:p-8 text-white shadow-xl">
+                            <span class="bg-gustyYellow text-gustyGreen text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-3">Agenda Kelompok</span>
+                            <h3 class="text-3xl font-extrabold text-gustyYellow">Rencana Wisata & Trip Berikutnya</h3>
+                            <p class="text-emerald-100 text-sm mt-2">Pilih destinasi, lihat jadwal itinerary, dan konfirmasi kehadiranmu sekarang!</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Trip Card Main -->
+                            <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-lg">Trip Utama #04</span>
+                                    <span class="text-xs text-gray-500"><i class="fa-regular fa-calendar mr-1"></i> 25-27 Juli 2026</span>
+                                </div>
+                                <h4 class="text-2xl font-bold text-gustyGreen">Gathering & Camping Pantai Tanjung Lesung</h4>
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    Nikmati kebersamaan dengan bakar-bakar ikan, games seru di pantai, dan menikmati matahari terbenam bersama seluruh anggota TEMAN GUSTY.
+                                </p>
+                                
+                                <div class="border-t border-gray-100 pt-4">
+                                    <h5 class="text-sm font-bold text-gustyGreen mb-2">Itinerary Singkat:</h5>
+                                    <ul class="space-y-2 text-xs text-gray-600">
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-gustyEmerald mt-0.5"></i> <span><strong>Hari 1:</strong> Titik kumpul di Basecamp, berangkat jam 08.00 pagi menuju lokasi.</span></li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-gustyEmerald mt-0.5"></i> <span><strong>Hari 2:</strong> Acara bebas, games kelompok, dan BBQ malam hari.</span></li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-gustyEmerald mt-0.5"></i> <span><strong>Hari 3:</strong> Sarapan pagi, foto bersama penutup, dan perjalanan pulang.</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Polling / Konfirmasi Kehadiran -->
+                            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm flex flex-col justify-between">
+                                <div>
+                                    <h4 class="text-lg font-bold text-gustyGreen mb-2">Konfirmasi Kehadiranmu</h4>
+                                    <p class="text-xs text-gray-500 mb-4">Apakah kamu akan ikutan trip kali ini?</p>
+
+                                    <div class="space-y-3">
+                                        <button onclick="voteTrip('Hadir')" id="btnHadir" class="w-full py-3 px-4 rounded-xl border-2 border-green-600 bg-green-50 text-gustyGreen font-bold text-sm flex items-center justify-between transition hover:bg-green-100">
+                                            <span><i class="fa-solid fa-check text-green-600 mr-2"></i> Ya, Pasti Hadir</span>
+                                            <span id="countHadir" class="bg-green-600 text-white text-xs px-2.5 py-1 rounded-full">8</span>
+                                        </button>
+                                        <button onclick="voteTrip('Ragu')" id="btnRagu" class="w-full py-3 px-4 rounded-xl border-2 border-amber-500 bg-amber-50 text-amber-800 font-bold text-sm flex items-center justify-between transition hover:bg-amber-100">
+                                            <span><i class="fa-solid fa-question text-amber-600 mr-2"></i> Masih Ragu / Menunggu</span>
+                                            <span id="countRagu" class="bg-amber-500 text-white text-xs px-2.5 py-1 rounded-full">3</span>
+                                        </button>
+                                        <button onclick="voteTrip('Absen')" id="btnAbsen" class="w-full py-3 px-4 rounded-xl border-2 border-red-500 bg-red-50 text-red-800 font-bold text-sm flex items-center justify-between transition hover:bg-red-100">
+                                            <span><i class="fa-solid fa-xmark text-red-600 mr-2"></i> Maaf, Berhalangan</span>
+                                            <span id="countAbsen" class="bg-red-500 text-white text-xs px-2.5 py-1 rounded-full">1</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="mt-6 pt-4 border-t border-gray-100 text-center">
+                                    <span id="userTripStatus" class="text-xs text-gray-500 font-medium">Status pilihanmu: Belum memilih</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7. NAMA ANGGOTA & RIWAYAT -->
+                    <div id="tab-anggota" class="tab-content hidden space-y-6">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+                            <div>
+                                <h3 class="text-xl font-bold text-gustyGreen">Direktori Anggota & Riwayat Kontribusi</h3>
+                                <p class="text-xs text-gray-500 mt-1">Daftar lengkap seluruh anggota beserta riwayat donasi, iuran, dan keaktifan trip.</p>
+                            </div>
+                            <div class="w-full sm:w-72">
+                                <input type="text" id="searchMember" onkeyup="filterMembers()" placeholder="Cari nama anggota..." class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-gustyGreen focus:outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Members Cards Grid -->
+                        <div id="membersGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+
+        <!-- MODAL UPLOAD MEDIA -->
+        <div id="uploadModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 border-4 border-gustyYellow">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gustyGreen">Unggah Foto / Video Baru</h3>
+                    <button onclick="closeUploadModal()" class="text-gray-400 hover:text-gray-700"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <form onsubmit="handleUploadMedia(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Judul / Keterangan Momen</label>
+                        <input type="text" id="uploadTitle" required placeholder="Cth: Nongkrong malam minggu di cafe..." class="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-gustyGreen focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Pilih Jenis Media</label>
+                        <select id="uploadType" class="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-gustyGreen focus:outline-none">
+                            <option value="image">Foto (Gambar)</option>
+                            <option value="video">Video Pendek</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">URL Gambar / Contoh Placeholder</label>
+                        <input type="text" id="uploadUrl" placeholder="Kosongkan untuk pakai foto acak otomatis" class="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-gustyGreen focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-gustyYellow hover:bg-yellow-400 text-gustyGreen font-bold py-3 rounded-xl shadow transition">
+                        Unggah Sekarang
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL DONASI -->
+        <div id="donationModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden p-4">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 border-4 border-gustyYellow">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gustyGreen">Salurkan Donasi</h3>
+                    <button onclick="closeDonationModal()" class="text-gray-400 hover:text-gray-700"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <form onsubmit="handleDonationSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Nominal Donasi (Rp)</label>
+                        <input type="number" id="donationAmount" required min="1" max="1000000000" step="1000" inputmode="numeric" placeholder="Cth: 50000" class="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-gustyGreen focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Pesan / Doa</label>
+                        <textarea id="donationMessage" placeholder="Tuliskan dukungan atau doa..." rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-gustyGreen focus:outline-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-gustyYellow hover:bg-yellow-400 text-gustyGreen font-bold py-3 rounded-xl shadow transition">
+                        Kirim Donasi
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Close open modals with the Escape key.
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeUploadModal();
+                closeDonationModal();
+            }
+        });
+
+        // Data Store
+        let currentUser = { name: '', phone: '' };
+
+        let chatMessages = [
+            { sender: 'Gusty Pratama', time: '10:15', text: 'Halo semua, siap untuk trip bulan depan ya!' },
+            { sender: 'Rizky Maulana', time: '10:18', text: 'Siap komandan, cuti udah diajukan wkwk.' },
+            { sender: 'Siti Aminah', time: '10:20', text: 'Jangan lupa iuran kas bulanan ya teman-teman.' }
+        ];
+
+        let galleryItems = [
+            { id: 1, title: 'Nongkrong Santai Akhir Pekan', type: 'image', url: 'https://placehold.co/600x400/064E3B/FACC15?text=Nongkrong+Teman+Gusty', uploader: 'Gusty Pratama', time: 'Kemarin' },
+            { id: 2, title: 'Trip Gunung Bromo Bersama', type: 'image', url: 'https://placehold.co/600x400/047857/FEF08A?text=Trip+Bromo', uploader: 'Budi Santoso', time: '3 hari lalu' },
+            { id: 3, title: 'Bakar-bakar Malam Tahun Baru', type: 'image', url: 'https://placehold.co/600x400/FACC15/064E3B?text=BBQ+Party', uploader: 'Dwi Lestari', time: 'Minggu lalu' }
+        ];
+
+        let donations = [
+            { name: 'Gusty Pratama', amount: 500000, message: 'Semoga bermanfaat untuk kas sosial kita!', time: 'Hari ini' },
+            { name: 'Rizky Maulana', amount: 250000, message: 'Ikut nyumbang ya kawan-kawan.', time: 'Kemarin' },
+            { name: 'Siti Aminah', amount: 200000, message: 'Sehat dan solid selalu TEMAN GUSTY!', time: '3 hari lalu' }
+        ];
+
+        let iuranData = [
+            { name: 'Gusty Pratama', period: 'Juni 2026', amount: 50000, status: 'Lunas' },
+            { name: 'Rizky Maulana', period: 'Juni 2026', amount: 50000, status: 'Lunas' },
+            { name: 'Siti Aminah', period: 'Juni 2026', amount: 50000, status: 'Lunas' },
+            { name: 'Dwi Lestari', period: 'Juni 2026', amount: 50000, status: 'Belum Lunas' },
+            { name: 'Budi Santoso', period: 'Juni 2026', amount: 50000, status: 'Lunas' },
+            { name: 'Andi Saputra', period: 'Juni 2026', amount: 50000, status: 'Belum Lunas' },
+            { name: 'Dewi Anggraini', period: 'Juni 2026', amount: 50000, status: 'Lunas' }
+        ];
+
+        let members = [
+            { name: 'Gusty Pratama', role: 'Ketua Grup', donations: 'Rp 1.500.000', trips: '4 Trip', status: 'Aktif', avatarGP: 'GP' },
+            { name: 'Rizky Maulana', role: 'Wakil Ketua', donations: 'Rp 750.000', trips: '4 Trip', status: 'Aktif', avatarGP: 'RM' },
+            { name: 'Siti Aminah', role: 'Bendahara 1', donations: 'Rp 1.000.000', trips: '3 Trip', status: 'Aktif', avatarGP: 'SA' },
+            { name: 'Dwi Lestari', role: 'Bendahara 2', donations: 'Rp 600.000', trips: '3 Trip', status: 'Aktif', avatarGP: 'DL' },
+            { name: 'Budi Santoso', role: 'Penanggung Jawab', donations: 'Rp 2.000.000', trips: '4 Trip', status: 'Aktif', avatarGP: 'BS' },
+            { name: 'Andi Saputra', role: 'Anggota', donations: 'Rp 300.000', trips: '2 Trip', status: 'Aktif', avatarGP: 'AS' },
+            { name: 'Dewi Anggraini', role: 'Anggota', donations: 'Rp 450.000', trips: '3 Trip', status: 'Aktif', avatarGP: 'DA' }
+        ];
+
+        let tripVotes = { Hadir: 8, Ragu: 3, Absen: 1 };
+        let userVote = null;
+
+        // Login Handler
+        function handleLogin(e) {
+            e.preventDefault();
+            const name = document.getElementById('loginName').value.trim();
+            const phone = document.getElementById('loginPhone').value.trim();
+            if(!name) return;
+
+            currentUser = { name, phone };
+            document.getElementById('userNameDisplay').innerText = name;
+            document.getElementById('welcomeUserName').innerText = name;
+            document.getElementById('userAvatar').innerText = name.charAt(0).toUpperCase();
+
+            document.getElementById('loginView').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+
+            renderAll();
+        }
+
+        function logout() {
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginView').classList.remove('hidden');
+            document.getElementById('loginName').value = '';
+            document.getElementById('loginPhone').value = '';
+        }
+
+        // Tab Switcher
+        function switchTab(tabId, clickedBtn = null) {
+            const target = document.getElementById('tab-' + tabId);
+            if (!target) return;
+
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            target.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-gustyYellow', 'text-gustyGreen', 'shadow');
+                btn.classList.add('text-emerald-100', 'hover:bg-gustyGreenHover');
+            });
+
+            if (clickedBtn) {
+                clickedBtn.classList.remove('text-emerald-100', 'hover:bg-gustyGreenHover');
+                clickedBtn.classList.add('bg-gustyYellow', 'text-gustyGreen', 'shadow');
+            }
+        }
+
+        // Security / formatting helpers
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+            }[ch]));
+        }
+
+        function safeUrl(value) {
+            try {
+                const url = new URL(String(value || ''), window.location.href);
+                if (url.protocol === 'https:' || url.protocol === 'http:') return url.href;
+            } catch (_) {}
+            return '';
+        }
+
+        function formatRupiah(value) {
+            const amount = Number(value);
+            return Number.isFinite(amount) ? 'Rp ' + Math.round(amount).toLocaleString('id-ID') : 'Rp 0';
+        }
+
+        // Render Functions
+        function renderAll() {
+            renderChat();
+            renderGallery();
+            renderDonations();
+            renderIuran();
+            renderMembers();
+        }
+
+        // Chat
+        function renderChat() {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = chatMessages.map(msg => `
+                <div class="flex flex-col ${msg.sender === currentUser.name ? 'items-end' : 'items-start'}">
+                    <span class="text-xs font-semibold text-gray-500 mb-1">${escapeHtml(msg.sender)} • <span class="text-[10px] text-gray-400">${escapeHtml(msg.time)}</span></span>
+                    <div class="max-w-md px-4 py-2.5 rounded-2xl text-sm ${msg.sender === currentUser.name ? 'bg-gustyGreen text-white rounded-tr-none shadow' : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none shadow-sm'}">
+                        ${escapeHtml(msg.text)}
+                    </div>
+                </div>
+            `).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendChatMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            chatMessages.push({ sender: currentUser.name, time, text });
+            input.value = '';
+            renderChat();
+        }
+
+        // Gallery
+        function renderGallery() {
+            const grid = document.getElementById('galleryGrid');
+            const fallback = 'https://placehold.co/600x400/064E3B/FACC15?text=Foto+Teman+Gusty';
+
+            grid.innerHTML = galleryItems.map(item => {
+                const url = safeUrl(item.url) || fallback;
+                const title = escapeHtml(item.title);
+                const uploader = escapeHtml(item.uploader);
+                const time = escapeHtml(item.time);
+                const type = item.type === 'video' ? 'video' : 'image';
+
+                const media = type === 'video'
+                    ? `<video src="${escapeHtml(url)}" class="w-full h-full object-cover" controls preload="metadata"></video>`
+                    : `<img src="${escapeHtml(url)}" alt="${title}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='${fallback}'">`;
+
+                const downloadLabel = type === 'video' ? 'Buka Video' : 'Unduh Foto';
+                return `
+                <div class="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition flex flex-col">
+                    <div class="relative h-48 bg-gray-100">${media}
+                        <span class="absolute top-3 right-3 bg-gustyGreen/80 backdrop-blur-sm text-gustyYellow text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">${type}</span>
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-gustyGreen text-base mb-1">${title}</h4>
+                            <p class="text-xs text-gray-500">Diunggah oleh <span class="font-semibold text-gray-700">${uploader}</span> (${time})</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+                            <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" ${type === 'image' ? 'download' : ''} class="text-xs font-bold text-gustyGreen hover:underline flex items-center gap-1.5 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-xl transition">
+                                <i class="fa-solid ${type === 'video' ? 'fa-play' : 'fa-download'}"></i> ${downloadLabel}
+                            </a>
+                            <span class="text-[10px] text-gray-400">Media</span>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function openUploadModal() { document.getElementById('uploadModal').classList.remove('hidden'); }
+        function closeUploadModal() { document.getElementById('uploadModal').classList.add('hidden'); }
+
+        function handleUploadMedia(e) {
+            e.preventDefault();
+            const title = document.getElementById('uploadTitle').value.trim();
+            const type = document.getElementById('uploadType').value;
+            let url = document.getElementById('uploadUrl').value.trim();
+
+            if (url) {
+                url = safeUrl(url);
+                if (!url) {
+                    alert('URL media tidak valid. Gunakan URL http/https yang benar.');
+                    return;
+                }
+            } else {
+                url = `https://placehold.co/600x400/064E3B/FACC15?text=` + encodeURIComponent(title);
+            }
+
+            galleryItems.unshift({
+                id: Date.now(),
+                title,
+                type,
+                url,
+                uploader: currentUser.name,
+                time: 'Baru saja'
+            });
+
+            closeUploadModal();
+            renderGallery();
+            document.getElementById('uploadTitle').value = '';
+            document.getElementById('uploadUrl').value = '';
+        }
+
+        // Donations
+        function renderDonations() {
+            const tbody = document.getElementById('donationTableBody');
+            tbody.innerHTML = donations.map(d => `
+                <tr class="hover:bg-amber-50/50 transition">
+                    <td class="p-3 font-semibold text-gustyGreen">${escapeHtml(d.name)}</td>
+                    <td class="p-3 font-bold text-emerald-700">Rp ${d.amount.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-gray-600">${escapeHtml(d.message)}</td>
+                    <td class="p-3 text-xs text-gray-400">${escapeHtml(d.time)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function openDonationModal() { document.getElementById('donationModal').classList.remove('hidden'); }
+        function closeDonationModal() { document.getElementById('donationModal').classList.add('hidden'); }
+
+        function handleDonationSubmit(e) {
+            e.preventDefault();
+            const amount = Number(document.getElementById('donationAmount').value);
+            const message = document.getElementById('donationMessage').value.trim() || 'Semoga berkah untuk semua.';
+
+            if (!Number.isFinite(amount) || amount <= 0 || amount > 1000000000) {
+                alert('Nominal donasi harus lebih dari Rp 0 dan maksimal Rp 1.000.000.000.');
+                return;
+            }
+
+            donations.unshift({
+                name: currentUser.name,
+                amount: Math.round(amount),
+                message: escapeHtml(message),
+                time: 'Baru saja'
+            });
+
+            // Update total
+            let total = donations.reduce((acc, curr) => acc + curr.amount, 0);
+            document.getElementById('totalDonation').innerText = formatRupiah(total);
+
+            closeDonationModal();
+            renderDonations();
+            document.getElementById('donationAmount').value = '';
+            document.getElementById('donationMessage').value = '';
+        }
+
+        // Iuran
+        function renderIuran() {
+            const tbody = document.getElementById('iuranTableBody');
+            tbody.innerHTML = iuranData.map((i, idx) => `
+                <tr class="hover:bg-amber-50/50 transition">
+                    <td class="p-3 font-semibold text-gray-800">${i.name}</td>
+                    <td class="p-3 text-gray-600">${i.period}</td>
+                    <td class="p-3 font-medium text-gray-700">Rp ${i.amount.toLocaleString('id-ID')}</td>
+                    <td class="p-3">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold ${i.status === 'Lunas' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}">
+                            ${i.status}
+                        </span>
+                    </td>
+                    <td class="p-3 text-right">
+                        <button onclick="toggleIuranStatus(${idx})" class="text-xs bg-gustyGreen hover:bg-gustyGreenHover text-white px-3 py-1.5 rounded-xl transition">
+                            Ubah Status
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function toggleIuranStatus(index) {
+            if (!Number.isInteger(index) || !iuranData[index]) return;
+            iuranData[index].status = iuranData[index].status === 'Lunas' ? 'Belum Lunas' : 'Lunas';
+            renderIuran();
+        }
+
+        // Trip Voting
+        function voteTrip(status) {
+            if (!Object.prototype.hasOwnProperty.call(tripVotes, status)) return;
+
+            if (userVote && tripVotes[userVote] > 0) {
+                tripVotes[userVote]--;
+            }
+            tripVotes[status]++;
+            userVote = status;
+
+            document.getElementById('countHadir').innerText = tripVotes.Hadir;
+            document.getElementById('countRagu').innerText = tripVotes.Ragu;
+            document.getElementById('countAbsen').innerText = tripVotes.Absen;
+            document.getElementById('userTripStatus').innerText =
+                'Status pilihanmu: ' + (status === 'Hadir' ? 'Hadir ✅' : status === 'Ragu' ? 'Ragu ❓' : 'Berhalangan ❌');
+        }
+
+        // Members Directory
+        function renderMembers() {
+            const grid = document.getElementById('membersGrid');
+            grid.innerHTML = members.map(m => `
+                <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gustyYellow text-gustyGreen font-bold text-xl flex items-center justify-center shrink-0 shadow">
+                        ${escapeHtml(m.avatarGP)}
+                    </div>
+                    <div class="flex-1 truncate">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-gustyGreen text-base truncate">${escapeHtml(m.name)}</h4>
+                            <span class="text-[10px] bg-emerald-100 text-gustyGreen font-semibold px-2 py-0.5 rounded-md">${escapeHtml(m.role)}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Total Donasi: <strong class="text-gray-700">${escapeHtml(m.donations)}</strong></p>
+                        <p class="text-xs text-gray-500">Keaktifan Trip: <strong class="text-gray-700">${escapeHtml(m.trips)}</strong></p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterMembers() {
+            const query = document.getElementById('searchMember').value.toLowerCase();
+            const filtered = members.filter(m => m.name.toLowerCase().includes(query) || m.role.toLowerCase().includes(query));
+            const grid = document.getElementById('membersGrid');
+            grid.innerHTML = filtered.map(m => `
+                <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gustyYellow text-gustyGreen font-bold text-xl flex items-center justify-center shrink-0 shadow">
+                        ${escapeHtml(m.avatarGP)}
+                    </div>
+                    <div class="flex-1 truncate">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-gustyGreen text-base truncate">${escapeHtml(m.name)}</h4>
+                            <span class="text-[10px] bg-emerald-100 text-gustyGreen font-semibold px-2 py-0.5 rounded-md">${escapeHtml(m.role)}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Total Donasi: <strong class="text-gray-700">${escapeHtml(m.donations)}</strong></p>
+                        <p class="text-xs text-gray-500">Keaktifan Trip: <strong class="text-gray-700">${escapeHtml(m.trips)}</strong></p>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
