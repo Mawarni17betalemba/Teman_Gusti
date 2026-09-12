@@ -1,0 +1,68 @@
+name: Build APK TEMAN GUSTY
+
+on:
+  push:
+    branches:
+      - utama
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ambil kode aplikasi
+        uses: actions/checkout@v4
+
+      - name: Siapkan Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Siapkan Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Siapkan aplikasi web
+        run: |
+          set -e
+
+          HTML_FILE=$(find . -maxdepth 1 -type f -iname "*.html" | head -n 1)
+
+          if [ -z "$HTML_FILE" ]; then
+            echo "File HTML TEMAN GUSTY tidak ditemukan."
+            exit 1
+          fi
+
+          echo "File HTML ditemukan: $HTML_FILE"
+
+          mkdir -p www
+          cp "$HTML_FILE" www/index.html
+
+      - name: Pasang Capacitor
+        run: |
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Buat proyek Android
+        run: |
+          npx cap init "TEMAN GUSTY" "com.temangusty.app" --web-dir www
+          npx cap add android
+          npx cap copy android
+
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Simpan APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: TEMAN-GUSTY-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
